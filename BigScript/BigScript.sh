@@ -16,33 +16,38 @@ function draw_board() {
     echo -e "\t${BOARD_SYMBOLS[6]} | ${BOARD_SYMBOLS[7]} | ${BOARD_SYMBOLS[8]}\n"
 }
 
-draw_board
-
-function user_place_symbol() {
-    echo "Enter your symbol: "
-    read USER_INPUT
+function user_place_symbol() {    
+    while [[ true ]]; do
     
-    # Check if input is valid
-    if [[ USER_INPUT -gt 9 || USER_INPUT -lt 1 ]]; then
-        echo "Invalid input, it should be between 1-9"
+        echo "Enter your symbol: "
+        read USER_INPUT
 
-    # Check if player is able to place his pawn here
-    elif [[ %{BOARD_SYMBOLS[USER_INPUT]} == $USER_SYMBOL ]]; then
-        echo "This place is arleady occupied by you pawn ($USER_SYMBOL)"
-    elif [[ ${BOARD_SYMBOLS[USER_INPUT]} == $AI_SYMBOL ]]; then
-        echo "This place is arleady occupied by AI pawn ($AI_SYMBOL)"
+        # Check if input is valid
+        if [[ USER_INPUT -gt 9 || USER_INPUT -lt 1 ]]; then
+            echo "Invalid input, it should be between 1-9"
+            continue
+    
+        # Check if player is able to place his pawn here
+        elif [[ ${BOARD_SYMBOLS[$((USER_INPUT - 1))]} == $USER_SYMBOL ]]; then
+            echo "This place is arleady occupied by your pawn ($USER_SYMBOL)"
+            continue
+        elif [[ ${BOARD_SYMBOLS[$((USER_INPUT - 1))]} == $AI_SYMBOL ]]; then
+            echo "This place is arleady occupied by AI pawn ($AI_SYMBOL)"
+            continue
 
-    # Otherwise we can insert the pawn
-    else
-        BOARD_SYMBOLS[$((USER_INPUT - 1))]=$USER_SYMBOL
-    fi
+        # Otherwise we can insert the pawn
+        else
+            BOARD_SYMBOLS[$((USER_INPUT - 1))]=$USER_SYMBOL
+            break
+        fi
+    done
 }
 
 function AI_place_symbol() {
     # Generate a random index between 1 and 9
     RANDOM_INDEX=$((1 + RANDOM % 9))
 
-    while [[ %{BOARD_SYMBOLS[RANDOM_INDEX]} == $USER_SYMBOL || %{BOARD_SYMBOLS[RANDOM_INDEX]} == $AI_SYMBOL ]]; do
+    while [[ ${BOARD_SYMBOLS[$((RANDOM_INDEX - 1))]} == $USER_SYMBOL || ${BOARD_SYMBOLS[$((RANDOM_INDEX - 1))]} == $AI_SYMBOL ]]; do
         RANDOM_INDEX=$((1 + RANDOM % 9))
     done
 
@@ -52,29 +57,88 @@ function AI_place_symbol() {
 
 PLAYER_WON="0"
 function player_won() {
-
+    PLAYER_WON="1"
 }
 
 AI_WON="0"
 function AI_won() {
-
+    AI_WON="1"
 }
 
+INDEX_WHO_START=0
+function who_start() {
+    RANDOM_PLAYER_INDEX=$((RANDOM % 2))
+    if [[ RANDOM_PLAYER_INDEX -eq 0 ]]; then
+        INDEX_WHO_START=0
+    else
+        INDEX_WHO_START=1
+    fi
+}
+
+# First run this function to randomly chose who begins
+who_start
+
+if [[ INDEX_WHO_START -eq 0 ]]; then
+    echo "Player starts the game"
+elif [[ INDEX_WHO_START -eq 1 ]]; then
+    echo "AI starts the game"
+fi
+
+PAWNS_ON_BOARD=0
+
 while [[ true ]]; do
-    
-    # Check if player won the game
-    if [[ PLAYER_WON == "1" ]]; then
-        echo "Player win"
-        break
 
-    # Check if AI won the game
-    if [[ AI_WON == "1" ]];then
-        echo "AI win"
-        break
+    draw_board
     
+    if [[ INDEX_WHO_START -eq 0 ]]; then
+
+        # Check if player won the game
+        if [[ PLAYER_WON == "1" ]]; then
+            echo "Player win"
+            break
+        # Check if AI won the game
+        elif [[ AI_WON == "1" ]];then
+            echo "AI win"
+            break
+        fi
+
+    else
+        # Check if AI won the game
+        if [[ AI_WON == "1" ]];then
+            echo "AI win"
+            break
+        # Check if player won the game
+        elif [[ PLAYER_WON == "1" ]]; then
+            echo "Player win"
+            break
+        fi
+    fi
+
+    # Based on who starts the game we make moves
+    if [[ INDEX_WHO_START -eq 0 ]]; then
+        user_place_symbol
+        PAWNS_ON_BOARD=$((PAWNS_ON_BOARD + 1))
+        draw_board
+        if [[ PAWNS_ON_BOARD -eq 9 ]]; then
+            echo "Draw"
+            draw_board
+            break
+        fi
+        AI_place_symbol
+        PAWNS_ON_BOARD=$((PAWNS_ON_BOARD + 1))
+    else
+        AI_place_symbol
+        PAWNS_ON_BOARD=$((PAWNS_ON_BOARD + 1))
+        draw_board
+        if [[ PAWNS_ON_BOARD -eq 9 ]]; then
+            echo "Draw"
+            break
+        fi
+        user_place_symbol
+        PAWNS_ON_BOARD=$((PAWNS_ON_BOARD + 1))
+    fi
+
+    player_won
+    AI_won
+
 done
-
-user_place_symbol
-draw_board
-AI_place_symbol
-draw_board
