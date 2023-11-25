@@ -57,12 +57,30 @@ function AI_place_symbol() {
 
 PLAYER_WON="0"
 function player_won() {
-    PLAYER_WON="1"
+    if [[ (${BOARD_SYMBOLS[0]} == $USER_SYMBOL && ${BOARD_SYMBOLS[1]} == $USER_SYMBOL && ${BOARD_SYMBOLS[2]} == $USER_SYMBOL) ||
+          (${BOARD_SYMBOLS[3]} == $USER_SYMBOL && ${BOARD_SYMBOLS[4]} == $USER_SYMBOL && ${BOARD_SYMBOLS[5]} == $USER_SYMBOL) || 
+          (${BOARD_SYMBOLS[6]} == $USER_SYMBOL && ${BOARD_SYMBOLS[7]} == $USER_SYMBOL && ${BOARD_SYMBOLS[8]} == $USER_SYMBOL) || 
+          (${BOARD_SYMBOLS[0]} == $USER_SYMBOL && ${BOARD_SYMBOLS[3]} == $USER_SYMBOL && ${BOARD_SYMBOLS[6]} == $USER_SYMBOL) || 
+          (${BOARD_SYMBOLS[1]} == $USER_SYMBOL && ${BOARD_SYMBOLS[4]} == $USER_SYMBOL && ${BOARD_SYMBOLS[7]} == $USER_SYMBOL) ||
+          (${BOARD_SYMBOLS[2]} == $USER_SYMBOL && ${BOARD_SYMBOLS[5]} == $USER_SYMBOL && ${BOARD_SYMBOLS[8]} == $USER_SYMBOL) ||
+          (${BOARD_SYMBOLS[0]} == $USER_SYMBOL && ${BOARD_SYMBOLS[4]} == $USER_SYMBOL && ${BOARD_SYMBOLS[8]} == $USER_SYMBOL) || 
+          (${BOARD_SYMBOLS[2]} == $USER_SYMBOL && ${BOARD_SYMBOLS[4]} == $USER_SYMBOL && ${BOARD_SYMBOLS[6]} == $USER_SYMBOL) ]]; then
+        PLAYER_WON="1"
+    fi
 }
 
 AI_WON="0"
 function AI_won() {
-    AI_WON="1"
+    if [[ (${BOARD_SYMBOLS[0]} == $AI_SYMBOL && ${BOARD_SYMBOLS[1]} == $AI_SYMBOL && ${BOARD_SYMBOLS[2]} == $AI_SYMBOL) ||
+          (${BOARD_SYMBOLS[3]} == $AI_SYMBOL && ${BOARD_SYMBOLS[4]} == $AI_SYMBOL && ${BOARD_SYMBOLS[5]} == $AI_SYMBOL) || 
+          (${BOARD_SYMBOLS[6]} == $AI_SYMBOL && ${BOARD_SYMBOLS[7]} == $AI_SYMBOL && ${BOARD_SYMBOLS[8]} == $AI_SYMBOL) || 
+          (${BOARD_SYMBOLS[0]} == $AI_SYMBOL && ${BOARD_SYMBOLS[3]} == $AI_SYMBOL && ${BOARD_SYMBOLS[6]} == $AI_SYMBOL) || 
+          (${BOARD_SYMBOLS[1]} == $AI_SYMBOL && ${BOARD_SYMBOLS[4]} == $AI_SYMBOL && ${BOARD_SYMBOLS[7]} == $AI_SYMBOL) ||
+          (${BOARD_SYMBOLS[2]} == $AI_SYMBOL && ${BOARD_SYMBOLS[5]} == $AI_SYMBOL && ${BOARD_SYMBOLS[8]} == $AI_SYMBOL) ||
+          (${BOARD_SYMBOLS[0]} == $AI_SYMBOL && ${BOARD_SYMBOLS[4]} == $AI_SYMBOL && ${BOARD_SYMBOLS[8]} == $AI_SYMBOL) || 
+          (${BOARD_SYMBOLS[2]} == $AI_SYMBOL && ${BOARD_SYMBOLS[4]} == $AI_SYMBOL && ${BOARD_SYMBOLS[6]} == $AI_SYMBOL) ]]; then
+        AI_WON="1"
+    fi
 }
 
 INDEX_WHO_START=0
@@ -89,37 +107,46 @@ PAWNS_ON_BOARD=0
 while [[ true ]]; do
 
     draw_board
-    
+    echo $PLAYER_WON
     if [[ INDEX_WHO_START -eq 0 ]]; then
 
         # Check if player won the game
-        if [[ PLAYER_WON == "1" ]]; then
+        if [[ $PLAYER_WON == "1" ]]; then
             echo "Player win"
             break
         # Check if AI won the game
-        elif [[ AI_WON == "1" ]];then
+        elif [[ $AI_WON == "1" ]];then
             echo "AI win"
             break
         fi
 
     else
         # Check if AI won the game
-        if [[ AI_WON == "1" ]];then
+        if [[ $AI_WON == "1" ]];then
             echo "AI win"
             break
         # Check if player won the game
-        elif [[ PLAYER_WON == "1" ]]; then
+        elif [[ $PLAYER_WON == "1" ]]; then
             echo "Player win"
             break
         fi
     fi
 
     # Based on who starts the game we make moves
-    if [[ INDEX_WHO_START -eq 0 ]]; then
+    if [[ $INDEX_WHO_START -eq 0 ]]; then
+
         user_place_symbol
         PAWNS_ON_BOARD=$((PAWNS_ON_BOARD + 1))
+
         draw_board
-        if [[ PAWNS_ON_BOARD -eq 9 ]]; then
+        player_won
+        # Check if AI won the game
+        if [[ $PLAYER_WON == "1" ]];then
+            echo "Player win"
+            break
+        fi
+        # Check for draw
+        if [[ $PAWNS_ON_BOARD -eq 9 ]]; then
             echo "Draw"
             draw_board
             break
@@ -129,8 +156,16 @@ while [[ true ]]; do
     else
         AI_place_symbol
         PAWNS_ON_BOARD=$((PAWNS_ON_BOARD + 1))
+
         draw_board
-        if [[ PAWNS_ON_BOARD -eq 9 ]]; then
+        AI_won
+        
+        # Check if AI won the game
+        if [[ $AI_WON == "1" ]];then
+            echo "AI win"
+            break
+        fi
+        if [[ $PAWNS_ON_BOARD -eq 9 ]]; then
             echo "Draw"
             break
         fi
