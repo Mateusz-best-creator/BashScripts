@@ -4,11 +4,6 @@ OPTION=0
 GROUP="mateusz"
 CATALOG="."
 
-# FILENAME=$1
-# CATALOG=$2
-# GROUP=$3
-# FILE_CONTENT=$4
-
 function display_options {
     echo """
     All available options
