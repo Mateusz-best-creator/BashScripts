@@ -1,20 +1,50 @@
 #!/bin/bash
 
-# Adding getopts
-function verbose_message() { echo "This script implements tic-tac-toe game and you can play with AI."; }
-function help_message() { echo "Hello this is a help message, so there will be some helpful tips."; }
 
-while getopts ":s:p:" o; do
-    case "${o}" in
+# Adding getops
+function help_message() {
+    echo """
+    Start the Game:
+    The tic-tac-toe board is a 3x3 grid.
+    You're 'X', and the AI is 'O'.
+
+    Make Your Move:
+        Type two numbers, like "2 2," to place your 'X' in that spot.
+
+    AI's Turn:
+        After your move, the AI automatically places 'O'.
+
+    Winning:
+        Get three 'X' or 'O' in a row to win.
+
+    Game End:
+        If someone wins, congrats!
+        If the board fills up, it's a draw.
+
+    Commands:
+        Just type where you want your 'X'.
+    """
+}
+
+function version_message() {
+    echo "Version 1.0: This script implements a tic-tac-toe game."
+}
+
+while getopts ":hvs:p:" opt; do
+    case "${opt}" in
         h)
-            
+            help_message
+            ;;
+        v)
+            version_message
             ;;
         *)
-            help_message
+            echo "Invalid option: -$OPTARG" >&2
+            exit 1
             ;;
     esac
 done
-# End of getops code
+
 
 USER_SYMBOL="X"
 AI_SYMBOL="O"
