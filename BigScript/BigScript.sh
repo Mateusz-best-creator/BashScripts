@@ -1,5 +1,21 @@
 #!/bin/bash
 
+# Adding getopts
+function verbose_message() { echo "This script implements tic-tac-toe game and you can play with AI."; }
+function help_message() { echo "Hello this is a help message, so there will be some helpful tips."; }
+
+while getopts ":s:p:" o; do
+    case "${o}" in
+        h)
+            
+            ;;
+        *)
+            help_message
+            ;;
+    esac
+done
+# End of getops code
+
 USER_SYMBOL="X"
 AI_SYMBOL="O"
 
