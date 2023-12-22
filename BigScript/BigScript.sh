@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Author : Mateusz Wieczorek s197743@student.pg.gda.pl  
+# Created On : 22.12.2023
+# Last Modified By : Mateusz Wieczorek s197743@student.pg.gda.pl  
+# Last Modified On : 22.12.2023
+# Version : 1.0.0
+# Description : This script implements TicTacToe game, you can play versus AI.
 
 # Adding getops
 function help_message() {
@@ -30,13 +36,18 @@ function version_message() {
     echo "Version 1.0: This script implements a tic-tac-toe game."
 }
 
-while getopts ":hvs:p:" opt; do
-    case "${opt}" in
+PLAYER_NAME="PLAYER"
+
+while getopts hvn: OPT; do
+    case "${OPT}" in
         h)
             help_message
             ;;
         v)
             version_message
+            ;;
+        n)
+            PLAYER_NAME=$OPTARG
             ;;
         *)
             echo "Invalid option: -$OPTARG" >&2
@@ -65,7 +76,7 @@ function draw_board() {
 function user_place_symbol() {    
     while [[ true ]]; do
     
-        echo "Enter your symbol: "
+        echo "$PLAYER_NAME your symbol: "
         read USER_INPUT
 
         # Check if input is valid
@@ -133,7 +144,7 @@ function who_start() {
 who_start
 
 if [[ INDEX_WHO_START -eq 0 ]]; then
-    echo "Player starts the game"
+    echo "$PLAYER_NAME starts the game"
 elif [[ INDEX_WHO_START -eq 1 ]]; then
     echo "AI starts the game"
 fi
@@ -147,7 +158,7 @@ while [[ true ]]; do
 
         # Check if player won the game
         if [[ $PLAYER_WON == "1" ]]; then
-            echo "Player win"
+            echo "$PLAYER_NAME win"
             break
         # Check if AI won the game
         elif [[ $AI_WON == "1" ]];then
@@ -162,7 +173,7 @@ while [[ true ]]; do
             break
         # Check if player won the game
         elif [[ $PLAYER_WON == "1" ]]; then
-            echo "Player win"
+            echo "$PLAYER_NAME win"
             break
         fi
     fi
@@ -177,7 +188,7 @@ while [[ true ]]; do
         PLAYER_WON=$(check_if_won "X")
         # Check if AI won the game
         if [[ $PLAYER_WON == "1" ]];then
-            echo "Player win"
+            echo "$PLAYER_NAME win"
             break
         fi
         # Check for draw
